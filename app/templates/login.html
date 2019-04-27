@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %} Login {% endblock %}
+{% block content %}
+    <br><br><br><br><br><br>
+    <div class="col-md-4 offset-md-4">
+        <h3>Login</h3><br>
+        <form method="post" action="{{ url_for('login') }}" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.username(class="form-control", placeholder="Username") }}
+            </div>
+            <div class="form-group">
+                {{ form.password(class="form-control", placeholder="Password") }}
+            </div>
+            <div class="form-group">
+                {{ form.remember_me() }} {{ form.remember_me.label }}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('signup') }}" class="btn btn-link">Sign Up</a>
+        </form>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </div>
+{% endblock %}

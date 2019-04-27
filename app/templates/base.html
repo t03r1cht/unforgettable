@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %} - Unforgettable</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alert.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}"/>
+
+
+</head>
+<body>
+
+{#Navbar#}
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{{ url_for('index') }}">Unforgettable</a>
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <p class="navbar-text" style="margin-top: 0px; margin-bottom: 0px;">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('control_panel') }}">{{ current_user.username }}</a>&nbsp;&nbsp;
+                    |
+                    &nbsp;&nbsp;
+                    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Login</a>&nbsp;&nbsp;
+                    |
+                    &nbsp;&nbsp;<a href="{{ url_for('signup') }}">Sign Up</a>
+                {% endif %}
+            </p>
+        </li>
+    </ul>
+</nav>
+
+<div class="container">
+    <br>
+    {#Errors#}
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+        {% if errors %}
+            {% for message in errors %}
+                <div class="myAlert-bottom alert alert-danger">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <i class="fa fa-times"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {#Info#}
+    {% with warnings = get_flashed_messages(category_filter=["warning"]) %}
+        {% if warnings %}
+            {% for message in warnings %}
+                <div class="myAlert-bottom alert alert-warning">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <i class="fa fa-info"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {#Success-Signup#}
+    {% with successes_signup = get_flashed_messages(category_filter=["success_signup"]) %}
+        {% if successes_signup %}
+            {% for message in successes_signup %}
+                <div class="myAlert-top-signup alert alert-success">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <i class="fa fa-check"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {#Success#}
+    {% with successes = get_flashed_messages(category_filter=["success"]) %}
+        {% if successes %}
+            {% for message in successes %}
+                <div class="myAlert-bottom alert alert-success">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <i class="fa fa-check"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/toasts.js') }}"></script>
+</body>
+</html>

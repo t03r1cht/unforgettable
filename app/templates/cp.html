@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %} Control Panel {% endblock %} {%
+block content %}
+<h3>Control Panel</h3>
+<br />
+<form>
+  <div class="form-group row">
+    <label for="usernameInput" class="col-sm-2 col-form-label">Username</label>
+    <div class="col-md-3">
+      <input
+        class="form-control"
+        id="usernameInput"
+        type="text"
+        placeholder="{{ current_user.username }}"
+        readonly
+      />
+    </div>
+  </div>
+</form>
+<!-- Settings that only admins can change -->
+{% if current_user.is_admin %}
+<form method="post" action="{{ url_for('cp_change_timezone') }}">
+  {{ settings_timezone_form.hidden_tag() }}
+  <div class="form-group row">
+    <label for="settingsTimezoneInput" class="col-sm-2 col-form-label"
+      >Timezone</label
+    >
+    <div class="col-md-3">
+      {{ settings_timezone_form.timezone(class="custom-select", id="settingsTimezoneInput") }}
+    </div>
+    {{ settings_timezone_form.submit(class="btn btn-primary") }}
+  </div>
+</form>
+{% endif %}
+<!-- Settings that only admins can change END -->
+<br />
+<a
+  class="btn btn-outline-dark"
+  href="{{ url_for('export_items') }}"
+  target="_blank"
+  role="button"
+  ><i class="fas fa-file-export"></i>&nbsp;&nbsp;Export Items
+</a>
+&nbsp; &nbsp; &nbsp; &nbsp;
+<a
+  class="btn btn-outline-dark disabled"
+  href="#"
+  role="button"
+  aria-disabled="true"
+  ><i class="fas fa-file-import"></i>&nbsp;&nbsp;Import Items
+</a>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %} Start {% endblock %}
+{% block content %}
+    <h1>Your tasks</h1>
+    <div class="float-right">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newReminderModalCenter"><i
+                class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Item
+        </button>
+        <button type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#newCategoryModalCenter"><i
+                class="fas fa-cube"></i>&nbsp;&nbsp;Add Category
+        </button>
+        <a class="btn btn-outline-dark" href="{{ url_for('item_history') }}" role="button"><i
+                class="fas fa-history"></i>&nbsp;&nbsp;Finished Items
+        </a>
+    </div>
+    <br>
+    <br>
+    <br>
+    {#    newReminderModalCenter#}
+    <div class="modal fade" id="newReminderModalCenter" tabindex="-1" role="dialog"
+         aria-labelledby="newReminderModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newReminderModalCenterTitle">Add a New Reminder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{{ url_for('add_reminder') }}">
+                        {{ addReminderForm.hidden_tag() }}
+                        <div class="form-group">
+                            {{ addReminderForm.title(class="form-control", placeholder="Title") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addReminderForm.description(class="form-control", placeholder="Description", maxlength="500") }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="reminderCategoryInput">Category</label>
+                            </div>
+                            {{ addReminderForm.category(class="custom-select", id="reminderCategoryInput") }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            {{ addReminderForm.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    newCategoryModalCenter#}
+    <div class="modal fade" id="newCategoryModalCenter" tabindex="-1" role="dialog"
+         aria-labelledby="newCategoryModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newCategoryModalCenterTitle">Add a New Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{{ url_for('add_category') }}">
+                        {{ addReminderCategoryForm.hidden_tag() }}
+                        <div class="form-group">
+                            {{ addReminderCategoryForm.name(class="form-control", placeholder="Category Name") }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            {{ addReminderCategoryForm.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if reminders %}
+        <div class="accordion" id="accordionReminderItems"> {#        start collapsible#}
+            {% for label_key, label_name in category_labels.items() %}
+                <div class="card">
+                    <div class="card-header" id="heading{{ label_name }}">
+                        <h2 class="mb-0">
+                            <button class="btn btn-light" type="button" data-toggle="collapse"
+                                    data-target="#collapse{{ label_name }}"
+                                    aria-expanded="false" aria-controls="collapse{{ label_name }}">
+                                {{ label_name }} <span
+                                    class="badge badge-light">{{ reminders[label_key]|length }}</span>
+                            </button>
+                        </h2>
+                    </div>
+
+                    <div id="collapse{{ label_name }}" class="collapse" aria-labelledby="heading{{ label_name }}"
+                         data-parent="#accordionReminderItems">
+                        <div class="card-body">
+                            {% if reminders[label_key]|length == 0 %}
+                                No items yet.
+                            {% else %}
+                                <div class="list-group">
+                                    {% for item in reminders[label_key] %}
+                                        {#                                        <li>{{ item.title }} {{ item.creation_date }}</li>#}
+                                        <div class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ item.title|truncate(60, True) }}</h5>
+                                                {#                                                <small>{{ item.creation_date.strftime("%d/%m/%Y %H:%M") }}</small>#}
+                                                <small>{{ item.creation_date|locale_strftime }}</small>
+                                            </div>
+                                            <p class="mb-1">{{ item.description|truncate(250, True) }}</p>
+                                            <div class="float-right">
+                                                <small><a class="btn btn-link btn-sm"
+                                                          href="{{ url_for('mark_as_finished', itemid=item.id) }}"
+                                                          role="button">Mark as
+                                                    finished</a>
+                                                    <a class="btn btn-link btn-sm"
+                                                       href="{{ url_for('edit_item', itemid=item.id) }}"
+                                                       role="button">Edit</a>
+                                                    <a class="btn btn-link btn-sm" href="#" role="button"
+                                                       data-toggle="modal"
+                                                       data-target="#itemDetailsModal{{ item.id }}">Details</a>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        {#    itemDetailsModal#}
+                                        <div class="modal fade" id="itemDetailsModal{{ item.id }}" tabindex="-1"
+                                             role="dialog"
+                                             aria-labelledby="newCategoryModalCenterTitle"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="newCategoryModalCenterTitle">Details
+                                                            for {{ item.title|truncate(50, True) }}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form method="post" action="{{ url_for('add_category') }}">
+                                                            <div class="form-group r">
+                                                                <div class="form-group">
+                                                                    <label for="detailsTitle{{ item.id }}"
+                                                                           class="col-sm-2 col-form-label">Title</label>
+                                                                    <div class="col-sm-10">
+                                                                        <textarea type="text" class="form-control"
+                                                                                  id="detailsTitle{{ item.id }}"
+                                                                                  placeholder="{{ item.title }}"
+                                                                                  readonly></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="form-group">
+                                                                    <label for="detailsDescription{{ item.id }}"
+                                                                           class="col-sm-5 col-form-label">Description</label>
+                                                                    <div class="col-sm-10">
+                                                                        <textarea type="text" class="form-control"
+                                                                                  id="detailsDescription{{ item.id }}"
+                                                                                  placeholder="{{ item.description }}"
+                                                                                  readonly></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="form-group">
+                                                                    <label for="detailsCategory{{ item.id }}"
+                                                                           class="col-sm-5 col-form-label">Category</label>
+                                                                    <div class="col-sm-10">
+                                                                        <textarea type="text" class="form-control"
+                                                                                  id="detailsCategory{{ item.id }}"
+                                                                                  placeholder="{{ item.category.name }}"
+                                                                                  readonly></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="form-group">
+                                                                    <label for="detailsOwner{{ item.id }}"
+                                                                           class="col-sm-5 col-form-label">Created
+                                                                        by</label>
+                                                                    <div class="col-sm-10">
+                                                                        <input type="text" class="form-control"
+                                                                               id="detailsOwner{{ item.id }}"
+                                                                               placeholder="{{ item.author.username }}"
+                                                                               readonly>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="form-group">
+                                                                    <label for="detailsCreationDate{{ item.id }}"
+                                                                           class="col-sm-5 col-form-label">Creation
+                                                                        Date</label>
+                                                                    <div class="col-sm-10">
+                                                                        <input type="text" class="form-control"
+                                                                               id="detailsCreationDate{{ item.id }}"
+                                                                               placeholder="{{ item.creation_date|locale_strftime }}"
+                                                                               readonly>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">Close
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div> {#        end collapsible#}
+    {% else %}
+        No reminders here yet.
+    {% endif %}
+
+{% endblock %}
